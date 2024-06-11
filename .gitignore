@@ -34,3 +34,4 @@ build/
 ### DEV ###
 h2/
 local-logs/
+local-mysql-data/

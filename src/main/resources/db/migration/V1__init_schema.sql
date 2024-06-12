@@ -1,11 +1,13 @@
-CREATE TABLE "entity"
+CREATE TABLE entity
 (
-    "id"   long PRIMARY KEY,
-    "name" varchar(255)
+    id   int NOT NULL AUTO_INCREMENT,
+    name varchar(255),
+    PRIMARY KEY (id)
 );
 
-CREATE TABLE "test_entity"
+CREATE TABLE test_entity
 (
-    "id"   long PRIMARY KEY,
-    "name" varchar(255)
+    id   int NOT NULL AUTO_INCREMENT,
+    name varchar(255),
+    PRIMARY KEY (id)
 );

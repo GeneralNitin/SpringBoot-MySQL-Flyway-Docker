@@ -10,7 +10,17 @@ Use the run configuration provided in .run directory to run the application with
 mvn clean install -P cloud -DskipTests
 ```
 
-2. Spin up using Docker Compose:
-```
-docker-compose up
-```
+2. Using application with Docker containers:
+
+   a. Build the application using the following command:
+   ```
+   mvn clean install -P cloud -DskipTests 
+   ```
+   b. Start the application:
+   ```
+   docker-compose up
+   ```
+   c. Clean up the resources:
+   ```
+   docker-compose down --rmi all
+   ```

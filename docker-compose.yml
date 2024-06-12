@@ -1,11 +1,11 @@
 services:
-  mysql:
+  mysqldb:
     image: mysql:8.0
     command: --default-authentication-plugin=caching_sha2_password
     restart: always
     environment:
-      MYSQL_DATABASE: 'demo'
-      MYSQL_ROOT_PASSWORD: Welcome@123
+      MYSQL_DATABASE: demo
+      MYSQL_ROOT_PASSWORD: Welcome@1
     volumes:
       - ./local-mysql-data:/var/lib/mysql
     ports:
@@ -22,5 +22,5 @@ services:
     ports:
       - "8081:8080"
     depends_on:
-      mysql:
+      mysqldb:
         condition: service_healthy

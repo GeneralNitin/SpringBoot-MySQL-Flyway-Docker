@@ -1,26 +1,114 @@
 services:
-  mysqldb:
-    image: mysql:8.0
-    command: --default-authentication-plugin=caching_sha2_password
-    restart: always
+  db:
+    image: mysql:latest
+    container_name: mysql_db
     environment:
+      MYSQL_ROOT_PASSWORD: welcome
       MYSQL_DATABASE: demo
-      MYSQL_ROOT_PASSWORD: Welcome@1
-    volumes:
-      - ./local-mysql-data:/var/lib/mysql
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: welcome
+    #      MYSQL_ALLOW_EMPTY_PASSWORD: yes
     ports:
-      - "3309:3306"
+      - "127.0.0.1:3309:3306"
+    networks:
+      - springboot-mysql-network
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
-      timeout: 5s
+      timeout: 3s
       retries: 5
-
-  spring-boot-app:
+    volumes:
+      - db_data:/var/lib/mysql
+    command: [ mysqld, --mysql-native-password=ON ]
+  app:
     build:
       dockerfile: Dockerfile
-    ports:
-      - "8081:8080"
+    container_name: springboot_app
     depends_on:
-      mysqldb:
+      db:
         condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/demo?useSSL=true&createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: user1
+      SPRING_DATASOURCE_PASSWORD: welcome
+      SPRING_FLYWAY_ENABLED: true
+    ports:
+      - "8080:8080"
+    networks:
+      - springboot-mysql-network
+
+networks:
+  springboot-mysql-network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./local-mysql-data
+
+#services:
+#  mysqldb:
+#    image: mysql
+#    container_name: mysqldb
+#    environment:
+#      MYSQL_ROOT_PASSWORD: Welcome@1
+#      MYSQL_DATABASE: demo
+#      MYSQL_HOST: mysqldb
+#      MYSQL_PORT: 3306
+#    ports:
+#      - 3309:3306
+#    healthcheck:
+#      test: ["CMD-SHELL", 'mysqladmin ping']
+#      interval: 10s
+#      timeout: 2s
+#      retries: 10
+#    volumes:
+##      - dbdata:/usr/app
+#      - ./local-mysql-data:/var/lib/mysql
+#    networks:
+#      - spring-network
+#
+#  spring-scon:
+#    container_name: scon
+#    build:
+#      dockerfile: Dockerfile
+#    ports:
+#      - 8081:8080
+#    depends_on:
+#      mysqldb:
+#        condition: service_healthy
+#    networks:
+#      - spring-network
+#networks:
+#  spring-network:
+#    driver: bridge
+#
+##services:
+##  mysqldb:
+##    image: mysql:8.0
+##    command: --default-authentication-plugin=caching_sha2_password
+##    restart: always
+##    environment:
+##      MYSQL_DATABASE: demo
+##      MYSQL_ROOT_PASSWORD: Welcome@1
+##    volumes:
+##      - ./local-mysql-data:/var/lib/mysql
+##    ports:
+##      - "3309:3306"
+##    healthcheck:
+##      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+##      interval: 10s
+##      timeout: 5s
+##      retries: 5
+##
+##  spring-boot-app:
+##    build:
+##      dockerfile: Dockerfile
+##    ports:
+##      - "8081:8080"
+##    depends_on:
+##      mysqldb:
+##        condition: service_healthy
